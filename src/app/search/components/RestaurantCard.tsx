@@ -1,4 +1,5 @@
 import Price from "@/app/components/Price";
+import Stars from "@/app/components/Stars";
 import { RestaurantCardType } from "@/app/page";
 import Link from "next/link";
 
@@ -13,13 +14,13 @@ export default function RestaurantCard({
       <div className="pl-5">
         <h2 className="text-3xl">{restaurant.name}</h2>
         <div className="flex items-start">
-          <div className="flex mb-2">*****</div>
+          <Stars reviews={restaurant.reviews} />
           <p className="ml-2 text-sm">Awesome</p>
         </div>
         <div className="mb-9">
           <div className="font-light flex text-reg">
             <Price price={restaurant.price} />
-            <p className="mr-4">{restaurant.Cuisine.name}</p>
+            <p className="mr-4">{restaurant.cuisine.name}</p>
             <p className="mr-4">{restaurant.location.name}</p>
           </div>
         </div>
