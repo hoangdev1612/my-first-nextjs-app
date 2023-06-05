@@ -4,12 +4,12 @@ import emptyStar from "../../../public/icons/empty-star.png";
 import Image from "next/image";
 import { Review } from "@prisma/client";
 import calculateReviewRatingAverage from "../../../utils/calculateReviewRatingAverage";
-const Stars = ({ reviews }: { reviews: Review[] }) => {
-  const rating = calculateReviewRatingAverage(reviews);
+const Stars = ({ reviews, rating }: { reviews: Review[]; rating?: number }) => {
+  const ratingReview = rating || calculateReviewRatingAverage(reviews);
   const renderStars = () => {
     const stars = [];
     for (let i = 0; i < 5; i++) {
-      const difference = parseFloat((rating - i).toFixed(1));
+      const difference = parseFloat((ratingReview - i).toFixed(1));
 
       switch (true) {
         case difference >= 1:
