@@ -7,7 +7,8 @@ import { SignJWT } from "jose";
 const prisma = new PrismaClient();
 const handlerSignin = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
+    const test = await prisma.$queryRaw`select * from public.user`;
+    return res.status(405).json({ message: test });
   }
   const { email, password } = req.body;
   const errors: any[] = [];

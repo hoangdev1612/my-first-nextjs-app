@@ -3,9 +3,11 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { TextField } from "@mui/material";
 import AuthModalInputs from "./AuthModalInputs";
+import useAuth from "../../../hooks/useAuth";
+import { AuthenticationContext } from "../../../context/AuthContext";
 
 const style = {
   position: "absolute" as "absolute",
@@ -23,6 +25,8 @@ export default function AuthModal({ isSignedIn }: { isSignedIn: boolean }) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const { signin } = useAuth();
+  const { error } = useContext(AuthenticationContext);
 
   let classNameButton = isSignedIn ? "bg-blue-400 text-white" : "";
 
@@ -38,6 +42,33 @@ export default function AuthModal({ isSignedIn }: { isSignedIn: boolean }) {
     city: "",
     password: "",
   });
+
+  const [disabled, setDisabled] = React.useState(true);
+  useEffect(() => {
+    if (isSignedIn) {
+      if (inputs.email && inputs.password) {
+        return setDisabled(false);
+      }
+    } else {
+      if (
+        inputs.firstName &&
+        inputs.lastName &&
+        inputs.email &&
+        inputs.phoneNumber &&
+        inputs.city &&
+        inputs.password
+      ) {
+        return setDisabled(false);
+      }
+    }
+    setDisabled(true);
+  }, [inputs]);
+
+  const handlerClick = () => {
+    if (isSignedIn) {
+      signin({ email: inputs.email, password: inputs.password });
+    }
+  };
 
   const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputs({ ...inputs, [e.target.name]: e.target.value });
@@ -71,8 +102,9 @@ export default function AuthModal({ isSignedIn }: { isSignedIn: boolean }) {
             />
             <button
               className="uppercase w-full bg-red-600 text-white p-3 rounded text-sm disabled:bg-gray-400"
-              onClick={handleClose}
               type="submit"
+              disabled={disabled}
+              onClick={handlerClick}
             >
               {renderContent("Sign In", "Create an account")}
             </button>
