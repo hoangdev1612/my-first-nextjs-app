@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import validator from "validator";
 import bcrypt from "bcrypt";
 import { SignJWT } from "jose";
+import { setCookie } from "cookies-next";
 
 const prisma = new PrismaClient();
 const handlerSignin = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -50,7 +51,20 @@ const handlerSignin = async (req: NextApiRequest, res: NextApiResponse) => {
     .setExpirationTime("2h")
     .setProtectedHeader({ alg: algorithm, typ: "JWT" })
     .sign(secret);
-  return res.status(200).json({ token: jwt });
+  setCookie("jwt", jwt, {
+    req,
+    res,
+    maxAge: 2 * 60 * 60 * 1000,
+  });
+  return res
+    .status(200)
+    .json({
+      firstName: userWithEmail.first_name,
+      lastName: userWithEmail.last_name,
+      email: userWithEmail.email,
+      phone: userWithEmail.phone,
+      city: userWithEmail.city,
+    });
 };
 
 export default handlerSignin;

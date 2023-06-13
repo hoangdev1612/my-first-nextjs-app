@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import React, { useContext, useEffect } from "react";
-import { TextField } from "@mui/material";
+import { Alert, CircularProgress, TextField } from "@mui/material";
 import AuthModalInputs from "./AuthModalInputs";
 import useAuth from "../../../hooks/useAuth";
 import { AuthenticationContext } from "../../../context/AuthContext";
@@ -25,8 +25,10 @@ export default function AuthModal({ isSignedIn }: { isSignedIn: boolean }) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const { signin } = useAuth();
-  const { error } = useContext(AuthenticationContext);
+  const { signin, signup } = useAuth();
+  const { error, loading, data, setAuthState } = useContext(
+    AuthenticationContext
+  );
 
   let classNameButton = isSignedIn ? "bg-blue-400 text-white" : "";
 
@@ -66,7 +68,9 @@ export default function AuthModal({ isSignedIn }: { isSignedIn: boolean }) {
 
   const handlerClick = () => {
     if (isSignedIn) {
-      signin({ email: inputs.email, password: inputs.password });
+      signin({ email: inputs.email, password: inputs.password, handleClose });
+    } else {
+      signup({ ...inputs, handleClose });
     }
   };
 
@@ -89,26 +93,33 @@ export default function AuthModal({ isSignedIn }: { isSignedIn: boolean }) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <div className="p-2 h-[600px]">
-            <div className="flex justify-center">
-              <Typography id="modal-modal-title" variant="h6" component="h2">
-                {renderContent("Log Into Account", "Create Your account")}
-              </Typography>
+          {loading ? (
+            <div className="p-2 h-[600px] flex justify-center">
+              <CircularProgress />
             </div>
-            <AuthModalInputs
-              inputs={inputs}
-              handleChangeInput={handleChangeInput}
-              isSignedIn={isSignedIn}
-            />
-            <button
-              className="uppercase w-full bg-red-600 text-white p-3 rounded text-sm disabled:bg-gray-400"
-              type="submit"
-              disabled={disabled}
-              onClick={handlerClick}
-            >
-              {renderContent("Sign In", "Create an account")}
-            </button>
-          </div>
+          ) : (
+            <div className="p-2 h-[600px]">
+              {error && <Alert severity="error">{error}</Alert>}
+              <div className="flex justify-center">
+                <Typography id="modal-modal-title" variant="h6" component="h2">
+                  {renderContent("Log Into Account", "Create Your account")}
+                </Typography>
+              </div>
+              <AuthModalInputs
+                inputs={inputs}
+                handleChangeInput={handleChangeInput}
+                isSignedIn={isSignedIn}
+              />
+              <button
+                className="uppercase w-full bg-red-600 text-white p-3 rounded text-sm disabled:bg-gray-400"
+                type="submit"
+                disabled={disabled}
+                onClick={handlerClick}
+              >
+                {renderContent("Sign In", "Create an account")}
+              </button>
+            </div>
+          )}
         </Box>
       </Modal>
     </div>
