@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useContext } from "react";
 import AuthContext, { AuthenticationContext } from "../context/AuthContext";
-import { getCookie } from "cookies-next";
+import { deleteCookie, getCookie } from "cookies-next";
 
 const useAuth = () => {
   const { setAuthState } = useContext(AuthenticationContext);
@@ -94,45 +94,19 @@ const useAuth = () => {
     }
   };
 
-  const fetchUser = async () => {
+  const signout = async () => {
+    deleteCookie("jwt");
     setAuthState({
       data: null,
-      loading: true,
+      loading: false,
       error: null,
     });
-    try {
-      const jwt = getCookie("jwt");
-      if (!jwt) {
-        return setAuthState({
-          data: null,
-          loading: false,
-          error: "No token",
-        });
-      }
-      const response = await axios.get("http://localhost:3000/api/auth/me", {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-      axios.defaults.headers.common["Authorization"] = `Bearer ${jwt}`;
-      setAuthState({
-        data: response.data,
-        loading: false,
-        error: null,
-      });
-    } catch (error: any) {
-      setAuthState({
-        data: null,
-        loading: false,
-        error: error.response.data.message,
-      });
-    }
   };
 
   return {
     signin,
     signup,
-    fetchUser,
+    signout,
   };
 };
 
